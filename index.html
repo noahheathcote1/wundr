@@ -366,7 +366,41 @@
         <div id="start-screen" class="screen active start-screen">
             <div class="logo">wundr.</div>
             <div class="subtitle">discover stories as you explore</div>
-            <button class="start-btn" onclick="startApp()">Start Exploring</button>
+            
+            <div style="margin: 30px 0;">
+                <div style="margin-bottom: 15px;">
+                    <input type="text" id="user-name" placeholder="What's your name?" style="
+                        width: 100%;
+                        padding: 15px 20px;
+                        border: 2px solid #f0f0f0;
+                        border-radius: 25px;
+                        font-size: 16px;
+                        outline: none;
+                        text-align: center;
+                    ">
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <select id="user-type" style="
+                        width: 100%;
+                        padding: 15px 20px;
+                        border: 2px solid #f0f0f0;
+                        border-radius: 25px;
+                        font-size: 16px;
+                        outline: none;
+                        text-align: center;
+                        background: white;
+                    ">
+                        <option value="">I'm a...</option>
+                        <option value="local">Local who knows the area</option>
+                        <option value="tourist">Tourist exploring</option>
+                        <option value="newcomer">New to this area</option>
+                        <option value="commuter">Just passing through</option>
+                        <option value="resident">Live nearby</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button class="start-btn" onclick="startApp()">Start My Adventure</button>
         </div>
         
         <!-- Checkpoint Screen -->
@@ -433,6 +467,8 @@
         let isPlayingExtra = false;
         let realLocationData = null;
         let nearbyPlaces = [];
+        let userName = '';
+        let userType = '';
         
         // ElevenLabs configuration
         const ELEVENLABS_API_KEY = 'sk_61f86bf5dbb60ff774c93b391ad9985c182b872a307c03fd';
@@ -1438,6 +1474,20 @@
 
         // App functions
         window.startApp = function() {
+            // Get user info
+            userName = document.getElementById('user-name').value.trim();
+            userType = document.getElementById('user-type').value;
+            
+            if (!userName) {
+                alert('Please enter your name first!');
+                return;
+            }
+            
+            if (!userType) {
+                alert('Please tell us what brings you here!');
+                return;
+            }
+            
             showScreen('loading-screen');
             
             // Check for audio permission
