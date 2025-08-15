@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>wundr</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: #ffffff;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        .screen {
+            display: none;
+            padding: 40px 30px;
+            min-height: 100vh;
+        }
+        
+        .screen.active {
+            display: block;
+        }
+        
+        .logo {
+            text-align: center;
+            margin: 80px 0 60px 0;
+        }
+        
+        .logo h1 {
+            font-size: 48px;
+            font-weight: 300;
+            color: #2c3e50;
+            letter-spacing: -1px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 16px;
+            margin-bottom: 60px;
+            font-weight: 300;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 16px 20px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: #2c3e50;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #34495e;
+            transform: translateY(-1px);
+        }
+        
+        .status-card {
+            background: #f8f9fa;
+            border-radius: 20px;
+            padding: 25px;
+            margin: 30px 0;
+            text-align: center;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .status-indicator.active {
+            background: #27ae60;
+            box-shadow: 0 0 10px rgba(39, 174, 96, 0.3);
+        }
+        
+        .status-indicator.inactive {
+            background: #e74c3c;
+        }
+        
+        .discovery-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 4px solid #3498db;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            animation: slideIn 0.3s ease;
+            position: relative;
+        }
+        
+        .discovery-card.triggered {
+            border-left-color: #27ae60;
+            background: linear-gradient(135deg, #ffffff 0%, #e8f5e8 100%);
+            animation: triggerPulse 0.6s ease;
+        }
+        
+        .discovery-card.street { border-left-color: #95a5a6; }
+        .discovery-card.building { border-left-color: #e74c3c; }
+        .discovery-card.nature { border-left-color: #27ae60; }
+        .discovery-card.historical { border-left-color: #9b59b6; }
+        .discovery-card.local { border-left-color: #f39c12; }
+        
+        .discovery-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        
+        .discovery-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .discovery-tag {
+            background: #ecf0f1;
+            color: #7f8c8d;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 10px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        
+        .discovery-tag.street { background: #eaeded; color: #566573; }
+        .discovery-tag.building { background: #fadbd8; color: #c0392b; }
+        .discovery-tag.nature { background: #d5f4e6; color: #27ae60; }
+        .discovery-tag.historical { background: #e8daef; color: #7d3c98; }
+        .discovery-tag.local { background: #fdeaa7; color: #d68910; }
+        
+        .discovery-content {
+            color: #7f8c8d;
+            font-size: 14px;
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+        
+        .discovery-meta {
+            font-size: 11px;
+            color: #bdc3c7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .stat-item {
+            text-align: center;
+            background: white;
+            padding: 15px 10px;
+            border-radius: 15px;
+            border: 1px solid #f1f2f6;
+        }
+        
+        .stat-number {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 9px;
+            color: #7f8c8d;
+            margin-top: 3px;
+            text-transform: uppercase;
+        }
+        
+        .floating-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(52, 152, 219, 0.3);
+            transition: transform 0.3s ease;
+            z-index: 100;
+        }
+        
+        .floating-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .floating-btn.scanning {
+            animation: pulse 2s infinite;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+        
+        .modal-content {
+            background: white;
+            margin: 10% auto;
+            padding: 30px;
+            width: 90%;
+            max-width: 350px;
+            border-radius: 25px;
+            position: relative;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: modalSlideIn 0.4s ease;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #bdc3c7;
+        }
+        
+        .discovery-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 25px 0 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #bdc3c7;
+        }
+        
+        .notification-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            font-size: 13px;
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 400px;
+            z-index: 999;
+            animation: slideDown 0.3s ease;
+        }
+        
+        .geo-info {
+            background: #e8f5e8;
+            color: #27ae60;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 500;
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes triggerPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 20px rgba(52, 152, 219, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(52, 152, 219, 0);
+            }
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8) translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        
+        @keyframes slideDown {
+            from {
+                transform: translateX(-50%) translateY(-100%);
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Screen -->
+        <div id="login-screen" class="screen active">
+            <div class="logo">
+                <h1>wundr.</h1>
+            </div>
+            
+            <div class="subtitle">discover the stories around you</div>
+            
+            <button class="btn btn-primary" onclick="startApp()">Start Exploring</button>
+            
+            <div style="text-align: center; margin-top: 40px; color: #bdc3c7; font-size: 14px;">
+                Works anywhere in the world using geo-location data
+            </div>
+        </div>
+        
+        <!-- Main App Screen -->
+        <div id="main-screen" class="screen">
+            <div style="margin-bottom: 100px; padding-top: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="font-size: 24px; font-weight: 600;">wundr</h2>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <button onclick="toggleAudio()" style="background: none; border: none; font-size: 20px; cursor: pointer;" title="Toggle Audio">
+                            🔊
+                        </button>
+                        <div style="display: flex; align-items: center; font-size: 12px; color: #7f8c8d;">
+                            <span class="status-indicator" id="location-status"></span>
+                            <span id="location-text">Location</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="geo-info">
+                    🌍 Geo-tag discovery: Creates content for any location
+                </div>
+                
+                <div class="status-card">
+                    <div style="font-size: 24px; margin-bottom: 15px;">📍</div>
+                    <div id="location-display">Detecting location...</div>
+                    <div style="font-size: 12px; color: #7f8c8d; margin-top: 8px;" id="location-coords"></div>
+                    <button class="btn btn-primary" onclick="enableLocation()" id="location-btn">Enable Location & Start Discovering</button>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-number" id="scanning-count">0</span>
+                        <div class="stat-label">SCANS</div>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="discovered-count">0</span>
+                        <div class="stat-label">FOUND</div>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="distance-walked">0m</span>
+                        <div class="stat-label">WALKED</div>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="last-discovery">--</span>
+                        <div class="stat-label">LAST</div>
+                    </div>
+                </div>
+                
+                <div class="section-title">
+                    ✨ Recent Discoveries
+                </div>
+                <div id="discoveries-list">
+                    <div class="empty-state">
+                        <div style="font-size: 32px; margin-bottom: 15px;">🔍</div>
+                        <div>Start walking to discover</div>
+                        <div style="font-size: 12px; margin-top: 5px;">Interesting facts about your surroundings will appear</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Floating Scan Button -->
+        <button class="floating-btn" onclick="forceScan()" id="scan-btn">📡</button>
+    </div>
+    
+    <!-- Discovery Modal -->
+    <div id="discovery-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-close" onclick="closeModal()">&times;</div>
+            <div class="discovery-icon" id="modal-icon">✨</div>
+            <h3 id="modal-title" style="margin-bottom: 10px;">Discovery!</h3>
+            <div id="modal-tag" class="discovery-tag" style="margin-bottom: 15px;">local</div>
+            <p id="modal-content" style="color: #7f8c8d; line-height: 1.5; margin-bottom: 15px;"></p>
+            <div id="modal-meta" style="font-size: 12px; color: #bdc3c7; margin-bottom: 25px;"></div>
+            <button class="btn btn-primary" onclick="closeModal()">Continue Exploring</button>
+        </div>
+    </div>
+
+    <script>
+        // App State + Audio
+        let currentLocation = null;
+        let isLocationEnabled = false;
+        let discoveries = [];
+        let lastLocation = null;
+        let totalDistance = 0;
+        let scanCount = 0;
+        let audioEnabled = true;
+        let currentAudio = null;
+
+        // Geo-tag based discovery templates
+        const discoveryTemplates = {
+            street: [
+                {
+                    trigger: () => Math.random() > 0.7,
+                    shortDesc: "Street name etymology: Many UK streets named after local landowners, historical events, or geographical features",
+                    content: "This street's name likely has historical significance! Many UK streets are named after former landowners, local historical events, or geographical features from centuries past.",
+                    icon: "🛣️"
+                },
+                {
+                    trigger: () => Math.random() > 0.8,
+                    shortDesc: "Victorian era planning: Grid patterns vs organic medieval layouts reveal different historical development periods",
+                    content: "The layout of these streets tells a story! Straight grid patterns often indicate Victorian development, while winding roads usually follow medieval field boundaries or ancient pathways.",
+                    icon: "🏘️"
+                }
+            ],
+            building: [
+                {
+                    trigger: () => Math.random() > 0.6,
+                    shortDesc: "Building materials: Local brick colors reveal regional clay deposits and historical building regulations",
+                    content: "The bricks around here tell a geological story! Local clay deposits determined brick colors - London yellow stock bricks, red Midlands clay, or grey Welsh slate reflect the area's natural resources.",
+                    icon: "🏠"
+                },
+                {
+                    trigger: () => Math.random() > 0.75,
+                    shortDesc: "Architectural periods: Window styles, door shapes, and rooflines indicate construction era and social class",
+                    content: "These buildings are a timeline in brick and mortar! Georgian symmetry, Victorian bay windows, Edwardian red brick, or modern glass reflect the era they were built and the wealth of original residents.",
+                    icon: "🏛️"
+                }
+            ],
+            nature: [
+                {
+                    trigger: () => Math.random() > 0.65,
+                    shortDesc: "Urban wildlife: Cities create unique ecosystems where wildlife adapts to human environments and thrives",
+                    content: "This area supports surprising urban wildlife! City environments create unique ecosystems - foxes, peregrine falcons, and various birds have adapted to urban life, often thriving better than in rural areas.",
+                    icon: "🌳"
+                },
+                {
+                    trigger: () => Math.random() > 0.7,
+                    shortDesc: "Tree species: London planes, oak, and lime trees chosen for pollution tolerance and urban resilience",
+                    content: "The trees here were carefully chosen for city life! London planes are pollution-resistant, oak trees can live for centuries, and lime trees were planted along Victorian streets for their symmetry and hardiness.",
+                    icon: "🌲"
+                }
+            ],
+            historical: [
+                {
+                    trigger: () => Math.random() > 0.8,
+                    shortDesc: "Historical layers: Modern areas often built over ancient settlements, Roman roads, or medieval field systems",
+                    content: "You're walking through layers of history! This area might be built over Roman settlements, medieval field systems, or follow ancient drove roads. Each generation builds upon the last, creating historical palimpsests.",
+                    icon: "⏳"
+                },
+                {
+                    trigger: () => Math.random() > 0.85,
+                    shortDesc: "Local industries: Area's past shaped by mills, factories, ports, or markets that determined settlement patterns",
+                    content: "This neighborhood's character was shaped by historical industry! Former mills, factories, ports, or markets determined where people lived, creating the community patterns and street layouts we see today.",
+                    icon: "⚙️"
+                }
+            ],
+            local: [
+                {
+                    trigger: () => Math.random() > 0.6,
+                    shortDesc: "Postcode stories: UK postcodes reveal geographical features, postal history, and administrative boundaries",
+                    content: "Your postcode tells a story! UK postcodes often reflect geographical features, old postal routes, or administrative boundaries. The letters indicate the postal area and district, connecting you to postal history.",
+                    icon: "📮"
+                },
+                {
+                    trigger: () => Math.random() > 0.7,
+                    shortDesc: "Public transport: Bus routes and train lines follow historical paths, connecting communities across centuries",
+                    content: "The transport routes here follow ancient paths! Many bus routes trace Roman roads, old coaching routes, or pathways between medieval villages, connecting communities in patterns established centuries ago.",
+                    icon: "🚌"
+                }
+            ]
+        };
+
+        // Initialize speech synthesis
+        function initializeSpeech() {
+            if ('speechSynthesis' in window) {
+                speechSynthesis.getVoices();
+                speechSynthesis.onvoiceschanged = () => {
+                    console.log('Speech voices loaded');
+                };
+            }
+        }
+
+        // Play audio description
+        function playAudioDescription(text, type = 'discovery') {
+            if (!audioEnabled || !('speechSynthesis' in window)) return;
+
+            if (currentAudio) {
+                speechSynthesis.cancel();
+            }
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = 0.9;
+            utterance.pitch = 1.0;
+            utterance.volume = 0.8;
+            
+            const voices = speechSynthesis.getVoices();
+            const preferredVoice = voices.find(voice => 
+                voice.name.includes('Google') || 
+                voice.name.includes('Microsoft') || 
+                voice.lang.startsWith('en-GB') ||
+                voice.lang.startsWith('en')
+            );
+            
+            if (preferredVoice) {
+                utterance.voice = preferredVoice;
+            }
+
+            speechSynthesis.speak(utterance);
+            currentAudio = utterance;
+            showAudioIndicator();
+        }
+
+        function showAudioIndicator() {
+            const indicator = document.createElement('div');
+            indicator.style.cssText = `
+                position: fixed;
+                top: 60px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: linear-gradient(135deg, #3498db, #2980b9);
+                color: white;
+                padding: 8px 15px;
+                border-radius: 20px;
+                font-size: 12px;
+                z-index: 999;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            `;
+            indicator.innerHTML = '🔊 Playing discovery';
+            document.body.appendChild(indicator);
+            
+            setTimeout(() => indicator.remove(), 3000);
+        }
+
+        function toggleAudio() {
+            audioEnabled = !audioEnabled;
+            showInAppNotification(`Audio ${audioEnabled ? 'enabled' : 'disabled'} 🔊`);
+            if (!audioEnabled && currentAudio) {
+                speechSynthesis.cancel();
+            }
+        }
+
+        // App Functions
+        window.startApp = function() {
+            showScreen('main');
+            requestNotificationPermission();
+            enableLocation();
+            initializeSpeech();
+        };
+
+        // Location Services with geo-tag discovery
+        window.enableLocation = function() {
+            if (!navigator.geolocation) {
+                alert('Geolocation not supported');
+                return;
+            }
+
+            const options = {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 30000
+            };
+
+            navigator.geolocation.watchPosition(
+                function(position) {
+                    const newLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude,
+                        accuracy: position.coords.accuracy
+                    };
+                    
+                    // Calculate distance moved
+                    if (currentLocation) {
+                        const distance = calculateDistance(
+                            currentLocation.lat, currentLocation.lng,
+                            newLocation.lat, newLocation.lng
+                        );
+                        
+                        // Only update if moved significant distance (>5m)
+                        if (distance > 5) {
+                            totalDistance += distance;
+                            currentLocation = newLocation;
+                            checkForDiscoveries();
+                        }
+                    } else {
+                        currentLocation = newLocation;
+                    }
+                    
+                    isLocationEnabled = true;
+                    updateLocationUI();
+                    
+                    if (!lastLocation) {
+                        startGeoTagScanning();
+                        showInAppNotification("Location enabled! Start walking to discover...");
+                    }
+                    
+                    lastLocation = newLocation;
+                },
+                function(error) {
+                    console.log('Location error:', error);
+                    showInAppNotification("Please enable location access to start discovering");
+                },
+                options
+            );
+        };
+
+        function startGeoTagScanning() {
+            // Check for discoveries every 20 seconds
+            setInterval(() => {
+                if (isLocationEnabled && currentLocation) {
+                    checkForDiscoveries();
+                }
+            }, 20000);
+            
+            // Initial scan after 3 seconds
+            setTimeout(() => {
+                checkForDiscoveries();
+            }, 3000);
+        }
+
+        function checkForDiscoveries() {
+            if (!currentLocation) return;
+
+            scanCount++;
+            updateStats();
+
+            // Generate discoveries based on movement and randomness
+            const shouldDiscover = Math.random() > 0.4; // 60% chance
+            
+            if (shouldDiscover) {
+                const discoveryType = getRandomDiscoveryType();
+                const templates = discoveryTemplates[discoveryType];
+                const template = templates[Math.floor(Math.random() * templates.length)];
+                
+                if (template.trigger()) {
+                    const discovery = {
+                        id: Date.now(),
+                        type: discoveryType,
+                        title: `${template.icon} ${getDiscoveryTitle(discoveryType)}`,
+                        shortDesc: template.shortDesc,
+                        content: template.content,
+                        icon: template.icon,
+                        timestamp: new Date(),
+                        location: {...currentLocation}
+                    };
+                    
+                    discoveries.unshift(discovery);
+                    
+                    // Keep only last 20 discoveries
+                    if (discoveries.length > 20) {
+                        discoveries = discoveries.slice(0, 20);
+                    }
+                    
+                    // Show discovery
+                    showDiscoveryModal(discovery);
+                    sendPushNotification(discovery);
+                    playAudioDescription(discovery.shortDesc, 'discovery');
+                    updateDiscoveriesDisplay();
+                    updateLastDiscoveryTime();
+                }
+            }
+        }
+
+        function getRandomDiscoveryType() {
+            const types = ['street', 'building', 'nature', 'historical', 'local'];
+            return types[Math.floor(Math.random() * types.length)];
+        }
+
+        function getDiscoveryTitle(type) {
+            const titles = {
+                street: 'Street Discovery',
+                building: 'Architecture Insight',
+                nature: 'Nature Spot',
+                historical: 'Historical Layer',
+                local: 'Local Knowledge'
+            };
+            return titles[type] || 'Discovery';
+        }
+
+        function updateDiscoveriesDisplay() {
+            const container = document.getElementById('discoveries-list');
+            
+            if (discoveries.length > 0) {
+                let html = '';
+                discoveries.forEach(discovery => {
+                    const timeAgo = getTimeAgo(discovery.timestamp);
+                    html += `
+                        <div class="discovery-card triggered ${discovery.type}">
+                            <div class="discovery-header">
+                                <div class="discovery-title">${discovery.title}</div>
+                                <div class="discovery-tag ${discovery.type}">${discovery.type}</div>
+                            </div>
+                            <div class="discovery-content">${discovery.shortDesc}</div>
+                            <div class="discovery-meta">
+                                <span>📍 ${discovery.location.lat.toFixed(4)}, ${discovery.location.lng.toFixed(4)}</span>
+                                <span>${timeAgo}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div style="font-size: 32px; margin-bottom: 15px;">🔍</div>
+                        <div>Start walking to discover</div>
+                        <div style="font-size: 12px; margin-top: 5px;">Interesting facts about your surroundings will appear</div>
+                    </div>
+                `;
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('scanning-count').textContent = scanCount;
+            document.getElementById('discovered-count').textContent = discoveries.length;
+            document.getElementById('distance-walked').textContent = Math.round(totalDistance) + 'm';
+        }
+
+        function updateLastDiscoveryTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-GB', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: false 
+            });
+            document.getElementById('last-discovery').textContent = timeString;
+        }
+
+        function updateLocationUI() {
+            const statusIndicator = document.getElementById('location-status');
+            const locationText = document.getElementById('location-text');
+            const locationDisplay = document.getElementById('location-display');
+            const locationCoords = document.getElementById('location-coords');
+            const locationBtn = document.getElementById('location-btn');
+
+            if (isLocationEnabled && currentLocation) {
+                statusIndicator.className = 'status-indicator active';
+                locationText.textContent = 'Active';
+                locationDisplay.textContent = 'Location tracking active';
+                locationCoords.textContent = `${currentLocation.lat.toFixed(6)}, ${currentLocation.lng.toFixed(6)}`;
+                locationBtn.style.display = 'none';
+            } else {
+                statusIndicator.className = 'status-indicator inactive';
+                locationText.textContent = 'Inactive';
+                locationDisplay.textContent = 'Enable location to start discovering';
+                locationCoords.textContent = '';
+                locationBtn.style.display = 'block';
+            }
+        }
+
+        // Notification Functions
+        function requestNotificationPermission() {
+            if ('Notification' in window) {
+                if (Notification.permission === 'default') {
+                    Notification.requestPermission().then(permission => {
+                        if (permission === 'granted') {
+                            showInAppNotification('Push notifications enabled! 🔔');
+                        }
+                    });
+                }
+            }
+        }
+
+        function sendPushNotification(discovery) {
+            if ('Notification' in window && Notification.permission === 'granted') {
+                const notification = new Notification(`${discovery.icon} Discovery!`, {
+                    body: discovery.shortDesc,
+                    tag: `wundr-${discovery.id}`,
+                    requireInteraction: false,
+                    silent: false
+                });
+
+                setTimeout(() => {
+                    notification.close();
+                }, 5000);
+            }
+
+            showInAppNotification(`Found: ${discovery.title}`);
+        }
+
+        function showInAppNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification-banner';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 4000);
+        }
+
+        // Modal Functions
+        function showDiscoveryModal(discovery) {
+            document.getElementById('modal-icon').textContent = discovery.icon;
+            document.getElementById('modal-title').textContent = discovery.title;
+            document.getElementById('modal-tag').textContent = discovery.type;
+            document.getElementById('modal-tag').className = `discovery-tag ${discovery.type}`;
+            document.getElementById('modal-content').textContent = discovery.content;
+            document.getElementById('modal-meta').textContent = `Discovered at ${discovery.location.lat.toFixed(4)}, ${discovery.location.lng.toFixed(4)}`;
+            document.getElementById('discovery-modal').style.display = 'block';
+        }
+
+        window.closeModal = function() {
+            document.getElementById('discovery-modal').style.display = 'none';
+        };
+
+        // Force scan function
+        window.forceScan = function() {
+            if (!currentLocation) {
+                showInAppNotification('Enable location first!');
+                return;
+            }
+
+            const scanBtn = document.getElementById('scan-btn');
+            scanBtn.classList.add('scanning');
+            
+            setTimeout(() => {
+                scanBtn.classList.remove('scanning');
+                checkForDiscoveries();
+                showInAppNotification('Scan complete!');
+            }, 2000);
+        };
+
+        // Utility Functions
+        function calculateDistance(lat1, lng1, lat2, lng2) {
+            const R = 6371e3; // Earth's radius in meters
+            const φ1 = lat1 * Math.PI/180;
+            const φ2 = lat2 * Math.PI/180;
+            const Δφ = (lat2-lat1) * Math.PI/180;
+            const Δλ = (lng2-lng1) * Math.PI/180;
+
+            const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+                      Math.cos(φ1) * Math.cos(φ2) *
+                      Math.sin(Δλ/2) * Math.sin(Δλ/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+            return R * c;
+        }
+
+        function getTimeAgo(date) {
+            const seconds = Math.floor((new Date() - date) / 1000);
+            if (seconds < 60) return 'Just now';
+            const minutes = Math.floor(seconds / 60);
+            if (minutes < 60) return `${minutes}m ago`;
+            const hours = Math.floor(minutes / 60);
+            return `${hours}h ago`;
+        }
+
+        // Navigation
+        function showScreen(screenName) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            const screenMap = {
+                'login': 'login-screen',
+                'main': 'main-screen'
+            };
+            
+            document.getElementById(screenMap[screenName]).classList.add('active');
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('discovery-modal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSpeech();
+        });
+
+        // Optional: Service Worker for offline functionality
+        // Commented out to avoid registration errors in preview
+        /*
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(() => console.log('Service Worker registered'))
+                .catch(() => console.log('Service Worker registration failed'));
+        }
+        */
+    </script>
+</body>
+</html>
