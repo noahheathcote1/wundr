@@ -103,7 +103,7 @@
             background: #e74c3c;
         }
         
-        .discovery-card {
+        .location-card {
             background: white;
             border-radius: 20px;
             padding: 20px;
@@ -111,30 +111,23 @@
             border-left: 4px solid #3498db;
             box-shadow: 0 5px 15px rgba(0,0,0,0.08);
             animation: slideIn 0.3s ease;
-            position: relative;
         }
         
-        .discovery-card.triggered {
-            border-left-color: #27ae60;
-            background: linear-gradient(135deg, #ffffff 0%, #e8f5e8 100%);
-            animation: triggerPulse 0.6s ease;
-        }
+        .location-card.street { border-left-color: #95a5a6; }
+        .location-card.business { border-left-color: #e74c3c; }
+        .location-card.landmark { border-left-color: #9b59b6; }
+        .location-card.area { border-left-color: #f39c12; }
+        .location-card.postal { border-left-color: #3498db; }
         
-        .discovery-card.street { border-left-color: #95a5a6; }
-        .discovery-card.building { border-left-color: #e74c3c; }
-        .discovery-card.nature { border-left-color: #27ae60; }
-        .discovery-card.historical { border-left-color: #9b59b6; }
-        .discovery-card.local { border-left-color: #f39c12; }
-        
-        .discovery-header {
+        .location-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
             margin-bottom: 10px;
         }
         
-        .discovery-title {
-            font-size: 16px;
+        .location-title {
+            font-size: 18px;
             font-weight: 600;
             color: #2c3e50;
             display: flex;
@@ -142,7 +135,7 @@
             gap: 8px;
         }
         
-        .discovery-tag {
+        .location-tag {
             background: #ecf0f1;
             color: #7f8c8d;
             padding: 4px 12px;
@@ -152,31 +145,42 @@
             text-transform: uppercase;
         }
         
-        .discovery-tag.street { background: #eaeded; color: #566573; }
-        .discovery-tag.building { background: #fadbd8; color: #c0392b; }
-        .discovery-tag.nature { background: #d5f4e6; color: #27ae60; }
-        .discovery-tag.historical { background: #e8daef; color: #7d3c98; }
-        .discovery-tag.local { background: #fdeaa7; color: #d68910; }
-        
-        .discovery-content {
+        .location-content {
             color: #7f8c8d;
             font-size: 14px;
             line-height: 1.4;
             margin-bottom: 8px;
         }
         
-        .discovery-meta {
+        .location-meta {
             font-size: 11px;
             color: #bdc3c7;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        }
+        
+        .current-location {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .current-location h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .address-line {
+            font-size: 14px;
+            margin-bottom: 5px;
+            opacity: 0.9;
         }
         
         .stats-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr;
-            gap: 10px;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
             margin: 20px 0;
         }
         
@@ -261,11 +265,6 @@
             color: #bdc3c7;
         }
         
-        .discovery-icon {
-            font-size: 40px;
-            margin-bottom: 15px;
-        }
-        
         .section-title {
             font-size: 18px;
             font-weight: 600;
@@ -280,6 +279,17 @@
             text-align: center;
             padding: 40px 20px;
             color: #bdc3c7;
+        }
+        
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
         }
         
         .notification-banner {
@@ -298,17 +308,6 @@
             animation: slideDown 0.3s ease;
         }
         
-        .geo-info {
-            background: #e8f5e8;
-            color: #27ae60;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 500;
-            text-align: center;
-            margin: 15px 0;
-        }
-        
         @keyframes slideIn {
             from {
                 opacity: 0;
@@ -318,12 +317,6 @@
                 opacity: 1;
                 transform: translateX(0);
             }
-        }
-        
-        @keyframes triggerPulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-            100% { transform: scale(1); }
         }
         
         @keyframes pulse {
@@ -357,6 +350,11 @@
                 transform: translateX(-50%) translateY(0);
             }
         }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -367,12 +365,12 @@
                 <h1>wundr.</h1>
             </div>
             
-            <div class="subtitle">discover the stories around you</div>
+            <div class="subtitle">discover real places around you</div>
             
             <button class="btn btn-primary" onclick="startApp()">Start Exploring</button>
             
             <div style="text-align: center; margin-top: 40px; color: #bdc3c7; font-size: 14px;">
-                Works anywhere in the world using geo-location data
+                Uses real location data and reverse geocoding
             </div>
         </div>
         
@@ -392,10 +390,6 @@
                     </div>
                 </div>
                 
-                <div class="geo-info">
-                    🌍 Geo-tag discovery: Creates content for any location
-                </div>
-                
                 <div class="status-card">
                     <div style="font-size: 24px; margin-bottom: 15px;">📍</div>
                     <div id="location-display">Detecting location...</div>
@@ -403,18 +397,23 @@
                     <button class="btn btn-primary" onclick="enableLocation()" id="location-btn">Enable Location & Start Discovering</button>
                 </div>
                 
+                <div id="current-location-info" style="display: none;">
+                    <div class="current-location">
+                        <h3 id="current-address">📍 Current Location</h3>
+                        <div class="address-line" id="street-name"></div>
+                        <div class="address-line" id="area-name"></div>
+                        <div class="address-line" id="postal-code"></div>
+                    </div>
+                </div>
+                
                 <div class="stats-grid">
                     <div class="stat-item">
-                        <span class="stat-number" id="scanning-count">0</span>
-                        <div class="stat-label">SCANS</div>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number" id="discovered-count">0</span>
+                        <span class="stat-number" id="discoveries-count">0</span>
                         <div class="stat-label">FOUND</div>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-number" id="distance-walked">0m</span>
-                        <div class="stat-label">WALKED</div>
+                        <span class="stat-number" id="locations-scanned">0</span>
+                        <div class="stat-label">SCANNED</div>
                     </div>
                     <div class="stat-item">
                         <span class="stat-number" id="last-discovery">--</span>
@@ -423,29 +422,38 @@
                 </div>
                 
                 <div class="section-title">
-                    ✨ Recent Discoveries
+                    🗺️ Location Details
                 </div>
-                <div id="discoveries-list">
+                <div id="location-details">
                     <div class="empty-state">
                         <div style="font-size: 32px; margin-bottom: 15px;">🔍</div>
-                        <div>Start walking to discover</div>
-                        <div style="font-size: 12px; margin-top: 5px;">Interesting facts about your surroundings will appear</div>
+                        <div>Enable location to see real place information</div>
+                    </div>
+                </div>
+                
+                <div class="section-title">
+                    🏪 Nearby Places
+                </div>
+                <div id="nearby-places">
+                    <div class="empty-state">
+                        <div style="font-size: 32px; margin-bottom: 15px;">🏢</div>
+                        <div>Searching for nearby businesses...</div>
                     </div>
                 </div>
             </div>
         </div>
         
         <!-- Floating Scan Button -->
-        <button class="floating-btn" onclick="forceScan()" id="scan-btn">📡</button>
+        <button class="floating-btn" onclick="scanCurrentArea()" id="scan-btn">📡</button>
     </div>
     
     <!-- Discovery Modal -->
     <div id="discovery-modal" class="modal">
         <div class="modal-content">
             <div class="modal-close" onclick="closeModal()">&times;</div>
-            <div class="discovery-icon" id="modal-icon">✨</div>
-            <h3 id="modal-title" style="margin-bottom: 10px;">Discovery!</h3>
-            <div id="modal-tag" class="discovery-tag" style="margin-bottom: 15px;">local</div>
+            <div style="font-size: 40px; margin-bottom: 15px;" id="modal-icon">📍</div>
+            <h3 id="modal-title" style="margin-bottom: 10px;">Location Discovery</h3>
+            <div id="modal-tag" class="location-tag" style="margin-bottom: 15px;">place</div>
             <p id="modal-content" style="color: #7f8c8d; line-height: 1.5; margin-bottom: 15px;"></p>
             <div id="modal-meta" style="font-size: 12px; color: #bdc3c7; margin-bottom: 25px;"></div>
             <button class="btn btn-primary" onclick="closeModal()">Continue Exploring</button>
@@ -453,91 +461,16 @@
     </div>
 
     <script>
-        // App State + Audio
+        // App State
         let currentLocation = null;
         let isLocationEnabled = false;
         let discoveries = [];
-        let lastLocation = null;
-        let totalDistance = 0;
         let scanCount = 0;
         let audioEnabled = true;
         let currentAudio = null;
+        let currentAddress = null;
 
-        // Geo-tag based discovery templates
-        const discoveryTemplates = {
-            street: [
-                {
-                    trigger: () => Math.random() > 0.7,
-                    shortDesc: "Street name etymology: Many UK streets named after local landowners, historical events, or geographical features",
-                    content: "This street's name likely has historical significance! Many UK streets are named after former landowners, local historical events, or geographical features from centuries past.",
-                    icon: "🛣️"
-                },
-                {
-                    trigger: () => Math.random() > 0.8,
-                    shortDesc: "Victorian era planning: Grid patterns vs organic medieval layouts reveal different historical development periods",
-                    content: "The layout of these streets tells a story! Straight grid patterns often indicate Victorian development, while winding roads usually follow medieval field boundaries or ancient pathways.",
-                    icon: "🏘️"
-                }
-            ],
-            building: [
-                {
-                    trigger: () => Math.random() > 0.6,
-                    shortDesc: "Building materials: Local brick colors reveal regional clay deposits and historical building regulations",
-                    content: "The bricks around here tell a geological story! Local clay deposits determined brick colors - London yellow stock bricks, red Midlands clay, or grey Welsh slate reflect the area's natural resources.",
-                    icon: "🏠"
-                },
-                {
-                    trigger: () => Math.random() > 0.75,
-                    shortDesc: "Architectural periods: Window styles, door shapes, and rooflines indicate construction era and social class",
-                    content: "These buildings are a timeline in brick and mortar! Georgian symmetry, Victorian bay windows, Edwardian red brick, or modern glass reflect the era they were built and the wealth of original residents.",
-                    icon: "🏛️"
-                }
-            ],
-            nature: [
-                {
-                    trigger: () => Math.random() > 0.65,
-                    shortDesc: "Urban wildlife: Cities create unique ecosystems where wildlife adapts to human environments and thrives",
-                    content: "This area supports surprising urban wildlife! City environments create unique ecosystems - foxes, peregrine falcons, and various birds have adapted to urban life, often thriving better than in rural areas.",
-                    icon: "🌳"
-                },
-                {
-                    trigger: () => Math.random() > 0.7,
-                    shortDesc: "Tree species: London planes, oak, and lime trees chosen for pollution tolerance and urban resilience",
-                    content: "The trees here were carefully chosen for city life! London planes are pollution-resistant, oak trees can live for centuries, and lime trees were planted along Victorian streets for their symmetry and hardiness.",
-                    icon: "🌲"
-                }
-            ],
-            historical: [
-                {
-                    trigger: () => Math.random() > 0.8,
-                    shortDesc: "Historical layers: Modern areas often built over ancient settlements, Roman roads, or medieval field systems",
-                    content: "You're walking through layers of history! This area might be built over Roman settlements, medieval field systems, or follow ancient drove roads. Each generation builds upon the last, creating historical palimpsests.",
-                    icon: "⏳"
-                },
-                {
-                    trigger: () => Math.random() > 0.85,
-                    shortDesc: "Local industries: Area's past shaped by mills, factories, ports, or markets that determined settlement patterns",
-                    content: "This neighborhood's character was shaped by historical industry! Former mills, factories, ports, or markets determined where people lived, creating the community patterns and street layouts we see today.",
-                    icon: "⚙️"
-                }
-            ],
-            local: [
-                {
-                    trigger: () => Math.random() > 0.6,
-                    shortDesc: "Postcode stories: UK postcodes reveal geographical features, postal history, and administrative boundaries",
-                    content: "Your postcode tells a story! UK postcodes often reflect geographical features, old postal routes, or administrative boundaries. The letters indicate the postal area and district, connecting you to postal history.",
-                    icon: "📮"
-                },
-                {
-                    trigger: () => Math.random() > 0.7,
-                    shortDesc: "Public transport: Bus routes and train lines follow historical paths, connecting communities across centuries",
-                    content: "The transport routes here follow ancient paths! Many bus routes trace Roman roads, old coaching routes, or pathways between medieval villages, connecting communities in patterns established centuries ago.",
-                    icon: "🚌"
-                }
-            ]
-        };
-
-        // Initialize speech synthesis
+        // Speech synthesis
         function initializeSpeech() {
             if ('speechSynthesis' in window) {
                 speechSynthesis.getVoices();
@@ -547,8 +480,7 @@
             }
         }
 
-        // Play audio description
-        function playAudioDescription(text, type = 'discovery') {
+        function playAudioDescription(text) {
             if (!audioEnabled || !('speechSynthesis' in window)) return;
 
             if (currentAudio) {
@@ -562,10 +494,7 @@
             
             const voices = speechSynthesis.getVoices();
             const preferredVoice = voices.find(voice => 
-                voice.name.includes('Google') || 
-                voice.name.includes('Microsoft') || 
-                voice.lang.startsWith('en-GB') ||
-                voice.lang.startsWith('en')
+                voice.lang.startsWith('en-GB') || voice.lang.startsWith('en')
             );
             
             if (preferredVoice) {
@@ -590,11 +519,8 @@
                 border-radius: 20px;
                 font-size: 12px;
                 z-index: 999;
-                display: flex;
-                align-items: center;
-                gap: 8px;
             `;
-            indicator.innerHTML = '🔊 Playing discovery';
+            indicator.innerHTML = '🔊 Playing location info';
             document.body.appendChild(indicator);
             
             setTimeout(() => indicator.remove(), 3000);
@@ -611,12 +537,11 @@
         // App Functions
         window.startApp = function() {
             showScreen('main');
-            requestNotificationPermission();
             enableLocation();
             initializeSpeech();
         };
 
-        // Location Services with geo-tag discovery
+        // Location Services with real geocoding
         window.enableLocation = function() {
             if (!navigator.geolocation) {
                 alert('Geolocation not supported');
@@ -626,172 +551,281 @@
             const options = {
                 enableHighAccuracy: true,
                 timeout: 10000,
-                maximumAge: 30000
+                maximumAge: 60000
             };
 
             navigator.geolocation.watchPosition(
                 function(position) {
-                    const newLocation = {
+                    currentLocation = {
                         lat: position.coords.latitude,
                         lng: position.coords.longitude,
                         accuracy: position.coords.accuracy
                     };
                     
-                    // Calculate distance moved
-                    if (currentLocation) {
-                        const distance = calculateDistance(
-                            currentLocation.lat, currentLocation.lng,
-                            newLocation.lat, newLocation.lng
-                        );
-                        
-                        // Only update if moved significant distance (>5m)
-                        if (distance > 5) {
-                            totalDistance += distance;
-                            currentLocation = newLocation;
-                            checkForDiscoveries();
-                        }
-                    } else {
-                        currentLocation = newLocation;
-                    }
-                    
                     isLocationEnabled = true;
                     updateLocationUI();
-                    
-                    if (!lastLocation) {
-                        startGeoTagScanning();
-                        showInAppNotification("Location enabled! Start walking to discover...");
-                    }
-                    
-                    lastLocation = newLocation;
+                    reverseGeocode(currentLocation.lat, currentLocation.lng);
+                    showInAppNotification("Location enabled! Getting real place data...");
                 },
                 function(error) {
                     console.log('Location error:', error);
-                    showInAppNotification("Please enable location access to start discovering");
+                    showInAppNotification("Please enable location access to discover real places");
                 },
                 options
             );
         };
 
-        function startGeoTagScanning() {
-            // Check for discoveries every 20 seconds
-            setInterval(() => {
-                if (isLocationEnabled && currentLocation) {
-                    checkForDiscoveries();
-                }
-            }, 20000);
-            
-            // Initial scan after 3 seconds
-            setTimeout(() => {
-                checkForDiscoveries();
-            }, 3000);
-        }
-
-        function checkForDiscoveries() {
-            if (!currentLocation) return;
-
-            scanCount++;
-            updateStats();
-
-            // Generate discoveries based on movement and randomness
-            const shouldDiscover = Math.random() > 0.4; // 60% chance
-            
-            if (shouldDiscover) {
-                const discoveryType = getRandomDiscoveryType();
-                const templates = discoveryTemplates[discoveryType];
-                const template = templates[Math.floor(Math.random() * templates.length)];
+        // Reverse geocoding using OpenStreetMap Nominatim (free API)
+        async function reverseGeocode(lat, lng) {
+            try {
+                showInAppNotification("Getting location details...");
                 
-                if (template.trigger()) {
-                    const discovery = {
-                        id: Date.now(),
-                        type: discoveryType,
-                        title: `${template.icon} ${getDiscoveryTitle(discoveryType)}`,
-                        shortDesc: template.shortDesc,
-                        content: template.content,
-                        icon: template.icon,
-                        timestamp: new Date(),
-                        location: {...currentLocation}
-                    };
-                    
-                    discoveries.unshift(discovery);
-                    
-                    // Keep only last 20 discoveries
-                    if (discoveries.length > 20) {
-                        discoveries = discoveries.slice(0, 20);
-                    }
-                    
-                    // Show discovery
-                    showDiscoveryModal(discovery);
-                    sendPushNotification(discovery);
-                    playAudioDescription(discovery.shortDesc, 'discovery');
-                    updateDiscoveriesDisplay();
-                    updateLastDiscoveryTime();
-                }
+                const response = await fetch(
+                    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`
+                );
+                
+                if (!response.ok) throw new Error('Geocoding failed');
+                
+                const data = await response.json();
+                console.log('Geocoding data:', data);
+                
+                currentAddress = data;
+                displayLocationInfo(data);
+                findNearbyPlaces(lat, lng);
+                
+            } catch (error) {
+                console.error('Geocoding error:', error);
+                showInAppNotification("Couldn't get location details - trying alternative...");
+                // Fallback to basic coordinate display
+                displayBasicLocation();
             }
         }
 
-        function getRandomDiscoveryType() {
-            const types = ['street', 'building', 'nature', 'historical', 'local'];
-            return types[Math.floor(Math.random() * types.length)];
-        }
-
-        function getDiscoveryTitle(type) {
-            const titles = {
-                street: 'Street Discovery',
-                building: 'Architecture Insight',
-                nature: 'Nature Spot',
-                historical: 'Historical Layer',
-                local: 'Local Knowledge'
-            };
-            return titles[type] || 'Discovery';
-        }
-
-        function updateDiscoveriesDisplay() {
-            const container = document.getElementById('discoveries-list');
+        function displayLocationInfo(addressData) {
+            const address = addressData.address || {};
+            const displayName = addressData.display_name || 'Unknown location';
             
-            if (discoveries.length > 0) {
-                let html = '';
-                discoveries.forEach(discovery => {
-                    const timeAgo = getTimeAgo(discovery.timestamp);
-                    html += `
-                        <div class="discovery-card triggered ${discovery.type}">
-                            <div class="discovery-header">
-                                <div class="discovery-title">${discovery.title}</div>
-                                <div class="discovery-tag ${discovery.type}">${discovery.type}</div>
-                            </div>
-                            <div class="discovery-content">${discovery.shortDesc}</div>
-                            <div class="discovery-meta">
-                                <span>📍 ${discovery.location.lat.toFixed(4)}, ${discovery.location.lng.toFixed(4)}</span>
-                                <span>${timeAgo}</span>
-                            </div>
+            // Update current location display
+            document.getElementById('current-location-info').style.display = 'block';
+            
+            // Extract address components
+            const streetName = address.road || address.pedestrian || address.footway || 'Unknown street';
+            const area = address.suburb || address.neighbourhood || address.village || address.town || address.city || 'Unknown area';
+            const postcode = address.postcode || 'No postcode';
+            
+            document.getElementById('street-name').textContent = streetName;
+            document.getElementById('area-name').textContent = area;
+            document.getElementById('postal-code').textContent = postcode;
+            
+            // Create location details
+            const locationDetails = document.getElementById('location-details');
+            let detailsHTML = '';
+            
+            // Street information
+            if (streetName !== 'Unknown street') {
+                detailsHTML += `
+                    <div class="location-card street">
+                        <div class="location-header">
+                            <div class="location-title">🛣️ ${streetName}</div>
+                            <div class="location-tag">street</div>
                         </div>
-                    `;
+                        <div class="location-content">You're currently on ${streetName} in ${area}.</div>
+                        <div class="location-meta">Road type: ${address.highway || 'residential'}</div>
+                    </div>
+                `;
+            }
+            
+            // Area information
+            if (area !== 'Unknown area') {
+                detailsHTML += `
+                    <div class="location-card area">
+                        <div class="location-header">
+                            <div class="location-title">🏘️ ${area}</div>
+                            <div class="location-tag">area</div>
+                        </div>
+                        <div class="location-content">This is the ${area} area of ${address.city || address.town || 'the city'}.</div>
+                        <div class="location-meta">${address.country || 'Unknown country'}</div>
+                    </div>
+                `;
+            }
+            
+            // Postal code information
+            if (postcode !== 'No postcode') {
+                detailsHTML += `
+                    <div class="location-card postal">
+                        <div class="location-header">
+                            <div class="location-title">📮 ${postcode}</div>
+                            <div class="location-tag">postal</div>
+                        </div>
+                        <div class="location-content">Postal code ${postcode} serves this local area.</div>
+                        <div class="location-meta">UK postal district</div>
+                    </div>
+                `;
+            }
+            
+            locationDetails.innerHTML = detailsHTML;
+            
+            // Play audio announcement
+            const audioText = `You are on ${streetName} in ${area}, postcode ${postcode}`;
+            playAudioDescription(audioText);
+            
+            updateStats();
+        }
+
+        function displayBasicLocation() {
+            if (!currentLocation) return;
+            
+            document.getElementById('current-location-info').style.display = 'block';
+            document.getElementById('street-name').textContent = `Lat: ${currentLocation.lat.toFixed(6)}`;
+            document.getElementById('area-name').textContent = `Lng: ${currentLocation.lng.toFixed(6)}`;
+            document.getElementById('postal-code').textContent = `Accuracy: ${currentLocation.accuracy}m`;
+            
+            const locationDetails = document.getElementById('location-details');
+            locationDetails.innerHTML = `
+                <div class="location-card">
+                    <div class="location-header">
+                        <div class="location-title">📍 Coordinates</div>
+                        <div class="location-tag">basic</div>
+                    </div>
+                    <div class="location-content">Location: ${currentLocation.lat.toFixed(6)}, ${currentLocation.lng.toFixed(6)}</div>
+                    <div class="location-meta">GPS accuracy: ${currentLocation.accuracy} meters</div>
+                </div>
+            `;
+        }
+
+        // Find nearby places using Overpass API (OpenStreetMap data)
+        async function findNearbyPlaces(lat, lng) {
+            try {
+                showInAppNotification("Searching for nearby places...");
+                
+                // Overpass API query for nearby amenities
+                const overpassQuery = `
+                    [out:json][timeout:25];
+                    (
+                        node["amenity"](around:200,${lat},${lng});
+                        node["shop"](around:200,${lat},${lng});
+                        node["leisure"](around:200,${lat},${lng});
+                    );
+                    out body;
+                `;
+                
+                const response = await fetch('https://overpass-api.de/api/interpreter', {
+                    method: 'POST',
+                    body: overpassQuery
                 });
-                container.innerHTML = html;
-            } else {
-                container.innerHTML = `
+                
+                if (!response.ok) throw new Error('Overpass API failed');
+                
+                const data = await response.json();
+                console.log('Nearby places:', data);
+                
+                displayNearbyPlaces(data.elements);
+                
+            } catch (error) {
+                console.error('Nearby places error:', error);
+                document.getElementById('nearby-places').innerHTML = `
                     <div class="empty-state">
-                        <div style="font-size: 32px; margin-bottom: 15px;">🔍</div>
-                        <div>Start walking to discover</div>
-                        <div style="font-size: 12px; margin-top: 5px;">Interesting facts about your surroundings will appear</div>
+                        <div style="font-size: 32px; margin-bottom: 15px;">❌</div>
+                        <div>Couldn't load nearby places</div>
+                        <div style="font-size: 12px; margin-top: 5px;">Check internet connection</div>
                     </div>
                 `;
             }
         }
 
-        function updateStats() {
-            document.getElementById('scanning-count').textContent = scanCount;
-            document.getElementById('discovered-count').textContent = discoveries.length;
-            document.getElementById('distance-walked').textContent = Math.round(totalDistance) + 'm';
+        function displayNearbyPlaces(places) {
+            const container = document.getElementById('nearby-places');
+            
+            if (places.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div style="font-size: 32px; margin-bottom: 15px;">🏜️</div>
+                        <div>No businesses found nearby</div>
+                        <div style="font-size: 12px; margin-top: 5px;">This might be a residential area</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            let placesHTML = '';
+            const uniquePlaces = new Set();
+            
+            places.slice(0, 10).forEach(place => {
+                const tags = place.tags || {};
+                const name = tags.name || tags.brand || 'Unnamed place';
+                const type = tags.amenity || tags.shop || tags.leisure || 'unknown';
+                
+                // Avoid duplicates
+                const placeKey = `${name}-${type}`;
+                if (uniquePlaces.has(placeKey)) return;
+                uniquePlaces.add(placeKey);
+                
+                const distance = calculateDistance(
+                    currentLocation.lat, currentLocation.lng,
+                    place.lat, place.lon
+                );
+                
+                const icon = getPlaceIcon(type);
+                const category = getPlaceCategory(type);
+                
+                placesHTML += `
+                    <div class="location-card business">
+                        <div class="location-header">
+                            <div class="location-title">${icon} ${name}</div>
+                            <div class="location-tag">${category}</div>
+                        </div>
+                        <div class="location-content">${getPlaceDescription(type, name)}</div>
+                        <div class="location-meta">${Math.round(distance)}m away • ${type}</div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = placesHTML || `
+                <div class="empty-state">
+                    <div style="font-size: 32px; margin-bottom: 15px;">🏪</div>
+                    <div>Processing nearby places...</div>
+                </div>
+            `;
         }
 
-        function updateLastDiscoveryTime() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('en-GB', { 
-                hour: '2-digit', 
-                minute: '2-digit',
-                hour12: false 
-            });
-            document.getElementById('last-discovery').textContent = timeString;
+        function getPlaceIcon(type) {
+            const icons = {
+                restaurant: '🍽️', cafe: '☕', pub: '🍺', bank: '🏦', 
+                pharmacy: '💊', shop: '🏪', supermarket: '🛒',
+                hospital: '🏥', school: '🏫', library: '📚',
+                park: '🌳', gym: '💪', hotel: '🏨', 
+                post_office: '📮', police: '👮', fire_station: '🚒'
+            };
+            return icons[type] || '📍';
+        }
+
+        function getPlaceCategory(type) {
+            const categories = {
+                restaurant: 'food', cafe: 'food', pub: 'food',
+                bank: 'finance', pharmacy: 'health', 
+                shop: 'retail', supermarket: 'retail',
+                hospital: 'health', school: 'education',
+                library: 'education', park: 'recreation',
+                gym: 'fitness', hotel: 'accommodation'
+            };
+            return categories[type] || 'place';
+        }
+
+        function getPlaceDescription(type, name) {
+            const descriptions = {
+                restaurant: `${name} serves food and drinks to local customers.`,
+                cafe: `${name} is a local cafe serving coffee and light meals.`,
+                pub: `${name} is a traditional British pub in your area.`,
+                bank: `${name} provides banking services to the local community.`,
+                pharmacy: `${name} offers prescription medicines and health products.`,
+                shop: `${name} is a local shop serving the neighborhood.`,
+                supermarket: `${name} is a supermarket with groceries and household items.`,
+                hospital: `${name} provides medical care and emergency services.`,
+                school: `${name} is an educational institution in your area.`,
+                library: `${name} offers books and community services.`,
+                park: `${name} is a green space for recreation and relaxation.`
+            };
+            return descriptions[type] || `${name} is a local ${type} in your area.`;
         }
 
         function updateLocationUI() {
@@ -804,76 +838,34 @@
             if (isLocationEnabled && currentLocation) {
                 statusIndicator.className = 'status-indicator active';
                 locationText.textContent = 'Active';
-                locationDisplay.textContent = 'Location tracking active';
+                locationDisplay.textContent = 'Getting real location data...';
                 locationCoords.textContent = `${currentLocation.lat.toFixed(6)}, ${currentLocation.lng.toFixed(6)}`;
                 locationBtn.style.display = 'none';
             } else {
                 statusIndicator.className = 'status-indicator inactive';
                 locationText.textContent = 'Inactive';
-                locationDisplay.textContent = 'Enable location to start discovering';
+                locationDisplay.textContent = 'Enable location to discover real places';
                 locationCoords.textContent = '';
                 locationBtn.style.display = 'block';
             }
         }
 
-        // Notification Functions
-        function requestNotificationPermission() {
-            if ('Notification' in window) {
-                if (Notification.permission === 'default') {
-                    Notification.requestPermission().then(permission => {
-                        if (permission === 'granted') {
-                            showInAppNotification('Push notifications enabled! 🔔');
-                        }
-                    });
-                }
-            }
-        }
-
-        function sendPushNotification(discovery) {
-            if ('Notification' in window && Notification.permission === 'granted') {
-                const notification = new Notification(`${discovery.icon} Discovery!`, {
-                    body: discovery.shortDesc,
-                    tag: `wundr-${discovery.id}`,
-                    requireInteraction: false,
-                    silent: false
-                });
-
-                setTimeout(() => {
-                    notification.close();
-                }, 5000);
-            }
-
-            showInAppNotification(`Found: ${discovery.title}`);
-        }
-
-        function showInAppNotification(message) {
-            const notification = document.createElement('div');
-            notification.className = 'notification-banner';
-            notification.textContent = message;
-            document.body.appendChild(notification);
+        function updateStats() {
+            document.getElementById('discoveries-count').textContent = discoveries.length;
+            document.getElementById('locations-scanned').textContent = scanCount;
             
-            setTimeout(() => {
-                notification.remove();
-            }, 4000);
+            if (discoveries.length > 0) {
+                const lastTime = discoveries[0].timestamp.toLocaleTimeString('en-GB', { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    hour12: false 
+                });
+                document.getElementById('last-discovery').textContent = lastTime;
+            }
         }
 
-        // Modal Functions
-        function showDiscoveryModal(discovery) {
-            document.getElementById('modal-icon').textContent = discovery.icon;
-            document.getElementById('modal-title').textContent = discovery.title;
-            document.getElementById('modal-tag').textContent = discovery.type;
-            document.getElementById('modal-tag').className = `discovery-tag ${discovery.type}`;
-            document.getElementById('modal-content').textContent = discovery.content;
-            document.getElementById('modal-meta').textContent = `Discovered at ${discovery.location.lat.toFixed(4)}, ${discovery.location.lng.toFixed(4)}`;
-            document.getElementById('discovery-modal').style.display = 'block';
-        }
-
-        window.closeModal = function() {
-            document.getElementById('discovery-modal').style.display = 'none';
-        };
-
-        // Force scan function
-        window.forceScan = function() {
+        // Manual scan function
+        window.scanCurrentArea = function() {
             if (!currentLocation) {
                 showInAppNotification('Enable location first!');
                 return;
@@ -882,10 +874,12 @@
             const scanBtn = document.getElementById('scan-btn');
             scanBtn.classList.add('scanning');
             
+            scanCount++;
+            
             setTimeout(() => {
                 scanBtn.classList.remove('scanning');
-                checkForDiscoveries();
-                showInAppNotification('Scan complete!');
+                reverseGeocode(currentLocation.lat, currentLocation.lng);
+                showInAppNotification('Area scanned! Updated location data.');
             }, 2000);
         };
 
@@ -905,14 +899,30 @@
             return R * c;
         }
 
-        function getTimeAgo(date) {
-            const seconds = Math.floor((new Date() - date) / 1000);
-            if (seconds < 60) return 'Just now';
-            const minutes = Math.floor(seconds / 60);
-            if (minutes < 60) return `${minutes}m ago`;
-            const hours = Math.floor(minutes / 60);
-            return `${hours}h ago`;
+        function showInAppNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification-banner';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 4000);
         }
+
+        // Modal Functions
+        function showDiscoveryModal(discovery) {
+            document.getElementById('modal-icon').textContent = discovery.icon;
+            document.getElementById('modal-title').textContent = discovery.title;
+            document.getElementById('modal-tag').textContent = discovery.type;
+            document.getElementById('modal-content').textContent = discovery.content;
+            document.getElementById('modal-meta').textContent = discovery.meta;
+            document.getElementById('discovery-modal').style.display = 'block';
+        }
+
+        window.closeModal = function() {
+            document.getElementById('discovery-modal').style.display = 'none';
+        };
 
         // Navigation
         function showScreen(screenName) {
@@ -940,16 +950,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             initializeSpeech();
         });
-
-        // Optional: Service Worker for offline functionality
-        // Commented out to avoid registration errors in preview
-        /*
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js')
-                .then(() => console.log('Service Worker registered'))
-                .catch(() => console.log('Service Worker registration failed'));
-        }
-        */
     </script>
 </body>
 </html>
