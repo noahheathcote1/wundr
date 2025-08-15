@@ -472,7 +472,7 @@
         
         // ElevenLabs configuration
         const ELEVENLABS_API_KEY = 'sk_61f86bf5dbb60ff774c93b391ad9985c182b872a307c03fd';
-        const ELEVENLABS_VOICE_ID = 'pNInz6obpgDQGcFmaJgB'; // Adam - natural British male voice
+        const ELEVENLABS_VOICE_ID = 'ZthjuvLPty3kTMaNKVKb'; // Updated voice ID
         const ELEVENLABS_API_URL = 'https://api.elevenlabs.io/v1/text-to-speech/';
         
         // Audio cache to avoid regenerating same content
@@ -1463,13 +1463,33 @@
             
             showScreen('checkpoint-screen');
             
-            // Auto-play audio announcement with real information
-            if (audioEnabled) {
+            // Welcome message for first checkpoint
+            if (currentCheckpoint === 1) {
+                const welcomeMessage = getPersonalizedWelcome();
                 setTimeout(() => {
-                    const audioText = `Checkpoint ${currentCheckpoint}! ${checkpoint.shortDesc}`;
-                    playAudio(audioText);
+                    playAudio(welcomeMessage);
                 }, 1000);
+            } else {
+                // Auto-play location-specific audio for subsequent checkpoints
+                if (audioEnabled && checkpoint.shortDesc) {
+                    setTimeout(() => {
+                        playAudio(checkpoint.shortDesc);
+                    }, 1000);
+                }
             }
+        }
+
+        // Personalized welcome message
+        function getPersonalizedWelcome() {
+            const welcomes = {
+                'local': `Hello ${userName}! I see you're a local - brilliant! I'll be your slightly obsessive location companion, pointing out things you've probably walked past a thousand times but never really noticed. Think of me as that friend who knows way too much about everything!`,
+                'tourist': `Welcome to Britain, ${userName}! I'm your overly enthusiastic local guide who's about to tell you things about this place that even most locals don't know. Prepare for some properly British humor and borderline ridiculous levels of local detail!`,
+                'newcomer': `Hello ${userName}! New to the area? Perfect! I'm like Google Maps but with jokes and an unhealthy obsession with local history. I'll help you discover all the weird and wonderful things about your new neighborhood!`,
+                'commuter': `Right then ${userName}, just passing through? No worries! I'll give you some proper local knowledge while you're here - think of it as educational entertainment for your journey. Much better than staring at your phone!`,
+                'resident': `Good to see you ${userName}! As a local resident, you'll appreciate some insider knowledge about your patch. I'm about to tell you things about your own area that might surprise you - or at least make you chuckle!`
+            };
+            
+            return welcomes[userType] || `Hello ${userName}! Ready for some ridiculously specific local knowledge? Let's explore!`;
         }
 
         // App functions
